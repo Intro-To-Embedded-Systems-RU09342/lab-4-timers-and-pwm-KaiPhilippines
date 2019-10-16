@@ -12,18 +12,29 @@
 #include <msp430.h> 
 int Duty_Cycle = 500;
 int debounce_state = 0;
-void LEDSetup();
-void ButtonSetup();
-void TimerA0Setup();
-void TimerA1Setup();
+
 
 int main(void)
 {
     WDTCTL = WDTPW | WDTHOLD;   // stop Watchdog timer
-    LEDSetup();
-    ButtonSetup();
-    TimerA0Setup();
-    TimerA1Setup();
+    
+    P1DIR |= BIT0; //Set LED P1.0 to output
+    P9DIR |= BIT7; //Set LED P9.7 to output
+    P1OUT &= ~BIT0;//turn LED P1.0 off
+    P9OUT &= ~BIT7;//turn LED P9.7 off
+    
+    P1DIR &= ~BIT1;//Set P1.1 to input
+    P1REN |= BIT1; //Enable Pull Up Resistor for P1.1
+    P1OUT |= BIT1; //Active High Button P1.1
+    P1IE |= BIT1;  //Enable Interrupt P1.1
+    P1IES |= BIT1; //P1.1 Interrupt positive edge trigger
+    P1IFG &= ~BIT1; //Clear P1.1 Interrupt Flag
+    
+    TA0CCR0 = 1000;//Set period for Up mode - for PWM
+    TA0CTL |= TASSEL_2 + MC_1 + TACLR; //Use SMCLK (1 Mhz), Up Mode, Clear Timer Registers - for PWM
+
+    TA1CCTL0 = CCIE; //interrupt enabled for debouncing
+    TA1CCR0 = 50000; //overflow time = 10ms for debouncing
 
     PM5CTL0 &= ~LOCKLPM5;    // Disable the GPIO power-on default high-impedance mode
                                       // to activate previously configured port settings
@@ -84,25 +95,8 @@ __interrupt void Timer1_ISR(void){
         break;
     }
 }
-void LEDSetup(){
-    P1DIR |= BIT0; //Set LED P1.0 to output
-    P9DIR |= BIT7; //Set LED P9.7 to output
-    P1OUT &= ~BIT0;//turn LED P1.0 off
-    P9OUT &= ~BIT7;//turn LED P9.7 off
-}
-void ButtonSetup(){
-    P1DIR &= ~BIT1;//Set P1.1 to input
-    P1REN |= BIT1; //Enable Pull Up Resistor for P1.1
-    P1OUT |= BIT1; //Active High Button P1.1
-    P1IE |= BIT1;  //Enable Interrupt P1.1
-    P1IES |= BIT1; //P1.1 Interrupt positive edge trigger
-    P1IFG &= ~BIT1; //Clear P1.1 Interrupt Flag
-}
-void TimerA0Setup(){
-    TA0CCR0 = 1000;//Set period for Up mode - for PWM
-    TA0CTL |= TASSEL_2 + MC_1 + TACLR; //Use SMCLK (1 Mhz), Up Mode, Clear Timer Registers - for PWM
-}
-void TimerA1Setup(){
-    TA1CCTL0 = CCIE; //interrupt enabled for debouncing
-    TA1CCR0 = 50000; //overflow time = 10ms for debouncing
-}
+
+
+
+
+
