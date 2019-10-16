@@ -41,15 +41,15 @@ int main(void)
    __enable_interrupt();
     for(;;){
         if((TA0R <= Duty_Cycle) && (Duty_Cycle != 0)){
-            P9OUT |= BIT7;  //LED P1.0 ON
+            P9OUT |= BIT7;  //LED P9.7 ON
         }
         else if(TA0R > Duty_Cycle){
-            P9OUT &= ~BIT7; //LED P1.0 OFF
+            P9OUT &= ~BIT7; //LED P9.7 OFF
         }
         if(!(P1IN & BIT1)){ //button pressed
-            P1OUT |= BIT0; //LED 9.7 ON
+            P1OUT |= BIT0; //LED 1.0 ON
         }
-        else {P1OUT &= ~BIT0;} //LED 1.6 OFF
+        else {P1OUT &= ~BIT0;} //LED 1.0 OFF
     }
 }
 #pragma vector = PORT1_VECTOR
