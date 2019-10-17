@@ -29,7 +29,6 @@ int main(void)
     TA0CCR1 = 100;  //set duty cycle
     TA0CCTL1 = OUTMOD_7;    //set timer to set/reset mode
     __enable_interrupt();
-    while(1);   //infinite while loop
 }
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1(void)
